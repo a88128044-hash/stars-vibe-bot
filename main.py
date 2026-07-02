@@ -31,6 +31,11 @@ REF_BONUS = 0.5
 
 
 def init_db():
+    # Автоматическое создание папки для базы данных, если её нет на сервере
+    db_dir = os.path.dirname(DB_NAME)
+    if db_dir:
+        os.makedirs(db_dir, exist_ok=True)
+
     conn = sqlite3.connect(DB_NAME)
     cursor = conn.cursor()
     cursor.execute('''
@@ -250,8 +255,8 @@ async def check_and_send_achievements(user_id: int):
                     await bot.send_message(
                         chat_id=user_id,
                         text=(
-                            f"🏆 *Новое достижение разблокировано!*\n\n"
-                            f"{emoji} *{name}* — выполнено {milestone} заданий\n"
+                            f"🏆 *Новое достижение разблокировано!*\\n\\n"
+                            f"{emoji} *{name}* — выполнено {milestone} заданий\\n"
                             f"Бонус: *+{bonus}⭐* зачислено на баланс!"
                         ),
                         parse_mode="Markdown"
@@ -263,8 +268,8 @@ async def check_and_send_achievements(user_id: int):
 async def notify_all_users(channel_username: str, reward: float):
     user_ids = get_all_user_ids()
     text = (
-        f"📢 *Новое задание в NanoStars!*\n\n"
-        f"Подпишись на канал @{channel_username} и получи *+{reward}⭐*\n\n"
+        f"📢 *Новое задание в NanoStars!*\\n\\n"
+        f"Подпишись на канал @{channel_username} и получи *+{reward}⭐*\\n\\n"
         f"Нажми «⭐ Заработать Звёзды» прямо сейчас!"
     )
     sent = 0
@@ -303,7 +308,7 @@ async def cmd_start(message: types.Message, command: types.BotCommand = None):
         try:
             await bot.send_message(
                 chat_id=referred_by,
-                text=f"🎉 По вашей ссылке зарегистрировался новый пользователь!\n"
+                text=f"🎉 По вашей ссылке зарегистрировался новый пользователь!\\n"
                      f"Вам начислено +{REF_BONUS}⭐"
             )
         except Exception:
@@ -328,12 +333,12 @@ async def cmd_start(message: types.Message, command: types.BotCommand = None):
     )
 
     welcome_text = (
-        f"🚀 Привет, {message.from_user.first_name}! Добро пожаловать в *NanoStars*!\n\n"
-        f"Здесь ты можешь:\n"
-        f"⭐ Зарабатывать Telegram Stars за подписки\n"
-        f"👥 Продвигать свой канал за Stars\n"
-        f"🎰 Удваивать Stars в казино\n"
-        f"👫 Приглашать друзей и получать бонусы\n\n"
+        f"🚀 Привет, {message.from_user.first_name}! Добро пожаловать в *NanoStars*!\\n\\n"
+        f"Здесь ты можешь:\\n"
+        f"⭐ Зарабатывать Telegram Stars за подписки\\n"
+        f"👥 Продвигать свой канал за Stars\\n"
+        f"🎰 Удваивать Stars в казино\\n"
+        f"👫 Приглашать друзей и получать бонусы\\n\\n"
         f"Выбери действие в меню ниже 👇"
     )
     await message.answer(text=welcome_text, reply_markup=builder.as_markup(resize_keyboard=True), parse_mode="Markdown")
@@ -351,8 +356,8 @@ async def menu_earn(message: types.Message):
     channel_username, reward = task
 
     task_text = (
-        f"💡 Получай Звёзды за простые задания! 👇\n\n"
-        f"🟢 Подпишись на канал и нажми «Подтвердить»\n\n"
+        f"💡 Получай Звёзды за простые задания! 👇\\n\\n"
+        f"🟢 Подпишись на канал и нажми «Подтвердить»\\n\\n"
         f"Вознаграждение: +{reward}⭐"
     )
 
@@ -409,8 +414,8 @@ async def menu_tasks_info(message: types.Message):
 async def menu_withdraw(message: types.Message):
     user_balance = get_balance(message.from_user.id)
     text = (
-        f"Заработано: {user_balance} ⭐\n\n"
-        f"Выбери сумму для вывода\n"
+        f"Заработано: {user_balance} ⭐\\n\\n"
+        f"Выбери сумму для вывода\\n"
         f"Канал с выводами: @ТвойКаналВыводов"
     )
     inline_builder = InlineKeyboardBuilder()
@@ -435,10 +440,10 @@ async def menu_referral(message: types.Message):
     ref_link = f"https://t.me/{bot_info.username}?start=ref_{user_id}"
 
     text = (
-        f"👥 *Реферальная программа*\n\n"
-        f"Приглашай друзей и получай *+{REF_BONUS}⭐* за каждого!\n\n"
-        f"🔗 Твоя ссылка:\n`{ref_link}`\n\n"
-        f"📊 Приглашено друзей: *{ref_count}*\n"
+        f"👥 *Реферальная программа*\\n\\n"
+        f"Приглашай друзей и получай *+{REF_BONUS}⭐* за каждого!\\n\\n"
+        f"🔗 Твоя ссылка:\\n`{ref_link}`\\n\\n"
+        f"📊 Приглашено друзей: *{ref_count}*\\n"
         f"💰 Заработано на рефералах: *{earned}⭐*"
     )
 
@@ -468,14 +473,14 @@ async def menu_profile(message: types.Message):
     achievements_text = " · ".join(earned) if earned else "Пока нет — выполняй задания!"
 
     text = (
-        f"📊 *Мой профиль*\n\n"
-        f"👤 {username}\n"
-        f"🆔 ID: `{user_id}`\n\n"
-        f"💰 Баланс: *{round(balance, 2)}⭐*\n"
-        f"✅ Заданий выполнено: *{tasks_done}*\n"
-        f"👥 Приглашено друзей: *{ref_count}*\n"
-        f"🎁 Заработано на рефералах: *{ref_earned}⭐*\n\n"
-        f"🏆 *Достижения:*\n{achievements_text}"
+        f"📊 *Мой профиль*\\n\\n"
+        f"👤 {username}\\n"
+        f"🆔 ID: `{user_id}`\\n\\n"
+        f"💰 Баланс: *{round(balance, 2)}⭐*\\n"
+        f"✅ Заданий выполнено: *{tasks_done}*\\n"
+        f"👥 Приглашено друзей: *{ref_count}*\\n"
+        f"🎁 Заработано на рефералах: *{ref_earned}⭐*\\n\\n"
+        f"🏆 *Достижения:*\\n{achievements_text}"
     )
     await message.answer(text=text, parse_mode="Markdown")
 
@@ -483,8 +488,8 @@ async def menu_profile(message: types.Message):
 @dp.message(F.text == "🎟 Промокод")
 async def menu_promo(message: types.Message, state: FSMContext):
     await message.answer(
-        "🎟 *Введи промокод*\n\n"
-        "Напиши промокод — и Stars упадут на баланс мгновенно!\n\n"
+        "🎟 *Введи промокод*\\n\\n"
+        "Напиши промокод — и Stars упадут на баланс мгновенно!\\n\\n"
         "_Промокоды раздаются в нашем канале._",
         parse_mode="Markdown"
     )
@@ -502,8 +507,8 @@ async def process_promo_code(message: types.Message, state: FSMContext):
     if status == "ok":
         new_balance = get_balance(user_id)
         await message.answer(
-            f"🎉 *Промокод активирован!*\n\n"
-            f"Начислено: *+{reward}⭐*\n"
+            f"🎉 *Промокод активирован!*\\n\\n"
+            f"Начислено: *+{reward}⭐*\\n"
             f"Текущий баланс: *{round(new_balance, 2)}⭐*",
             parse_mode="Markdown"
         )
@@ -516,8 +521,6 @@ async def process_promo_code(message: types.Message, state: FSMContext):
 
 
 # Тарифы: (название, количество подписчиков, цена в Stars)
-# Математика: 100 подп. = 200⭐ → 160⭐ блогеру (80%), 40⭐ нам
-# Из 40⭐ мы платим ~25⭐ юзерам за подписки → чистый профит 15⭐
 SUBSCRIBER_PLANS = [
     ("50 подписчиков", 50, 100),
     ("100 подписчиков", 100, 200),
@@ -528,9 +531,9 @@ SUBSCRIBER_PLANS = [
 @dp.message(F.text == "👥 Купить Подписчиков")
 async def menu_buy_subscribers(message: types.Message, state: FSMContext):
     await message.answer(
-        "🚀 *NanoStars — Продвижение канала*\n\n"
-        "Введи юзернейм канала, который хочешь продвинуть (БЕЗ знака @).\n\n"
-        "После оплаты реальные пользователи NanoStars начнут подписываться автоматически!\n\n"
+        "🚀 *NanoStars — Продвижение канала*\\n\\n"
+        "Введи юзернейм канала, который хочешь продвинуть (БЕЗ знака @).\\n\\n"
+        "После оплаты реальные пользователи NanoStars начнут подписываться автоматически!\\n\\n"
         "*Пример:* my\\_crypto\\_channel",
         parse_mode="Markdown"
     )
@@ -543,7 +546,7 @@ async def process_channel_name(message: types.Message, state: FSMContext):
     await state.clear()
 
     text = (
-        f"📦 *Тарифы для @{channel_username}*\n\n"
+        f"📦 *Тарифы для @{channel_username}*\\n\\n"
         f"Выбери пакет подписчиков:"
     )
     inline_builder = InlineKeyboardBuilder()
@@ -598,11 +601,11 @@ async def successful_payment(message: types.Message):
     asyncio.create_task(notify_all_users(channel_username, reward_per_sub))
 
     await message.answer(
-        f"✅ *Оплата принята!*\n\n"
-        f"Канал: *@{channel_username}*\n"
-        f"Заказ: *{count} подписчиков*\n"
-        f"Оплачено: *{stars_paid}⭐*\n\n"
-        f"Ваш канал добавлен в задания NanoStars — подписчики начнут приходить автоматически!\n"
+        f"✅ *Оплата принята!*\\n\\n"
+        f"Канал: *@{channel_username}*\\n"
+        f"Заказ: *{count} подписчиков*\\n"
+        f"Оплачено: *{stars_paid}⭐*\\n\\n"
+        f"Ваш канал добавлен в задания NanoStars — подписчики начнут приходить автоматически!\\n"
         f"По вопросам: @ТвойАккаунт",
         parse_mode="Markdown"
     )
@@ -612,11 +615,11 @@ async def successful_payment(message: types.Message):
             await bot.send_message(
                 chat_id=ADMIN_ID,
                 text=(
-                    f"💰 *НОВЫЙ ЗАКАЗ!*\n\n"
-                    f"👤 @{message.from_user.username} (ID: `{message.from_user.id}`)\n"
-                    f"📢 Канал: *@{channel_username}*\n"
-                    f"📦 Заказ: *{count} подписчиков*\n"
-                    f"⭐ Оплачено: *{stars_paid} Stars*\n\n"
+                    f"💰 *НОВЫЙ ЗАКАЗ!*\\n\\n"
+                    f"👤 @{message.from_user.username} (ID: `{message.from_user.id}`)\\n"
+                    f"📢 Канал: *@{channel_username}*\\n"
+                    f"📦 Заказ: *{count} подписчиков*\\n"
+                    f"⭐ Оплачено: *{stars_paid} Stars*\\n\\n"
                     f"Канал автоматически добавлен в задания!"
                 ),
                 parse_mode="Markdown"
@@ -632,10 +635,10 @@ WIN_CHANCE = 40  # % шанс выигрыша (40% — профит у влад
 async def menu_casino(message: types.Message):
     balance = get_balance(message.from_user.id)
     text = (
-        f"🎰 *Казино*\n\n"
-        f"Испытай удачу! Выбери ставку и крути барабан.\n"
-        f"Шанс удвоить: *40%* | Шанс потерять: *60%*\n\n"
-        f"Твой баланс: *{round(balance, 2)}⭐*\n\n"
+        f"🎰 *Казино*\\n\\n"
+        f"Испытай удачу! Выбери ставку и крути барабан.\\n"
+        f"Шанс удвоить: *40%* | Шанс потерять: *60%*\\n\\n"
+        f"Твой баланс: *{round(balance, 2)}⭐*\\n\\n"
         f"Выбери сумму ставки:"
     )
     inline_builder = InlineKeyboardBuilder()
@@ -676,10 +679,10 @@ async def callback_casino_play(callback: types.CallbackQuery):
         change_balance(user_id, winnings)
         new_balance = get_balance(user_id)
         result_text = (
-            f"🎰 Барабан крутится...\n\n"
-            f"🍒 🍒 🍒\n\n"
-            f"🎉 *ПОБЕДА!* Ты удвоил ставку!\n"
-            f"Выиграно: *+{bet}⭐* (ставка возвращена + приз)\n"
+            f"🎰 Барабан крутится...\\n\\n"
+            f"🍒 🍒 🍒\\n\\n"
+            f"🎉 *ПОБЕДА!* Ты удвоил ставку!\\n"
+            f"Выиграно: *+{bet}⭐* (ставка возвращена + приз)\\n"
             f"Баланс: *{round(new_balance, 2)}⭐*"
         )
     else:
@@ -691,10 +694,10 @@ async def callback_casino_play(callback: types.CallbackQuery):
             "🍋 🍊 🍒",
         ])
         result_text = (
-            f"🎰 Барабан крутится...\n\n"
-            f"{symbols}\n\n"
-            f"😞 *Не повезло...* Ставка сгорела.\n"
-            f"Потеряно: *{bet}⭐*\n"
+            f"🎰 Барабан крутится...\\n\\n"
+            f"{symbols}\\n\\n"
+            f"😞 *Не повезло...* Ставка сгорела.\\n"
+            f"Потеряно: *{bet}⭐*\\n"
             f"Баланс: *{round(new_balance, 2)}⭐*"
         )
 
@@ -729,9 +732,9 @@ async def callback_withdraw_request(callback: types.CallbackQuery):
         if ADMIN_ID != 0:
             try:
                 admin_text = (
-                    f"🚨 **НОВАЯ ЗАЯВКА НА ВЫВОД!** 🚨\n\n"
-                    f"👤 Юзер: @{callback.from_user.username} (ID: `{user_id}`)\n"
-                    f"💰 Сумма вывода: **{amount} ⭐**\n"
+                    f"🚨 **НОВАЯ ЗАЯВКА НА ВЫВОД!** 🚨\\n\\n"
+                    f"👤 Юзер: @{callback.from_user.username} (ID: `{user_id}`)\\n"
+                    f"💰 Сумма вывода: **{amount} ⭐**\\n"
                     f"Переведи ему звёзды на баланс вручную!"
                 )
                 await bot.send_message(chat_id=ADMIN_ID, text=admin_text, parse_mode="Markdown")
@@ -772,16 +775,16 @@ async def cmd_stats(message: types.Message):
     top_text = ""
     for i, (username, balance) in enumerate(top_users, 1):
         name = f"@{username}" if username else "Без ника"
-        top_text += f"  {i}. {name} — {round(balance, 2)}⭐\n"
+        top_text += f"  {i}. {name} — {round(balance, 2)}⭐\\n"
 
     stats_text = (
-        f"📊 **Статистика бота**\n\n"
-        f"👥 Пользователей: {total_users}\n"
-        f"👥 Пришли по рефералке: {total_refs}\n"
-        f"✅ Заданий выполнено: {total_tasks}\n"
-        f"📢 Каналов-партнеров: {total_channels}\n"
-        f"💰 Суммарный баланс: {round(total_balance, 2)}⭐\n\n"
-        f"🏆 **Топ-5 пользователей:**\n{top_text if top_text else '  Пока пусто'}"
+        f"📊 **Статистика бота**\\n\\n"
+        f"👥 Пользователей: {total_users}\\n"
+        f"👥 Пришли по рефералке: {total_refs}\\n"
+        f"✅ Заданий выполнено: {total_tasks}\\n"
+        f"📢 Каналов-партнеров: {total_channels}\\n"
+        f"💰 Суммарный баланс: {round(total_balance, 2)}⭐\\n\\n"
+        f"🏆 **Топ-5 пользователей:**\\n{top_text if top_text else '  Пока пусто'}"
     )
     await message.answer(text=stats_text, parse_mode="Markdown")
 
@@ -792,16 +795,16 @@ async def cmd_admin(message: types.Message):
         return
 
     admin_help = (
-        "👑 **Админ-панель NanoStars**\n\n"
-        "📊 Статистика:\n"
-        "`/stats` — пользователи, задания, топ-5\n\n"
-        "📢 Управление каналами:\n"
-        "`/add_channel юзернейм награда`\n"
-        "Пример: `/add_channel durov 0.5`\n"
-        "`/del_channel юзернейм`\n\n"
-        "🎟 Промокоды:\n"
-        "`/add_promo КОД награда количество`\n"
-        "Пример: `/add_promo NANO2025 2.0 100`\n"
+        "👑 **Админ-панель NanoStars**\\n\\n"
+        "📊 Статистика:\\n"
+        "`/stats` — пользователи, задания, топ-5\\n\\n"
+        "📢 Управление каналами:\\n"
+        "`/add_channel юзернейм награда`\\n"
+        "Пример: `/add_channel durov 0.5`\\n"
+        "`/del_channel юзернейм`\\n\\n"
+        "🎟 Промокоды:\\n"
+        "`/add_promo КОД награда количество`\\n"
+        "Пример: `/add_promo NANO2025 2.0 100`\\n"
         "_(создаст промокод NANO2025 на 2⭐, 100 использований)_"
     )
     await message.answer(text=admin_help, parse_mode="Markdown")
@@ -850,7 +853,7 @@ async def admin_add_promo(message: types.Message):
 
     args = message.text.split()
     if len(args) < 4:
-        await message.answer("Ошибка! Пиши так: `/add_promo КОД награда количество`\nПример: `/add_promo NANO2025 2.0 100`")
+        await message.answer("Ошибка! Пиши так: `/add_promo КОД награда количество`\\nПример: `/add_promo NANO2025 2.0 100`")
         return
 
     code = args[1].upper()
@@ -859,9 +862,9 @@ async def admin_add_promo(message: types.Message):
         uses = int(args[3])
         db_add_promo(code, reward, uses)
         await message.answer(
-            f"✅ Промокод создан!\n\n"
-            f"🎟 Код: `{code}`\n"
-            f"💰 Награда: {reward}⭐\n"
+            f"✅ Промокод создан!\\n\\n"
+            f"🎟 Код: `{code}`\\n"
+            f"💰 Награда: {reward}⭐\\n"
             f"🔢 Использований: {uses}"
         )
     except ValueError:
